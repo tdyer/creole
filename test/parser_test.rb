@@ -1,13 +1,17 @@
 require 'creole'
+require 'minitest/autorun'
 
-class Bacon::Context
-  def tc(html, creole, options = {})
-    Creole.creolize(creole, options).should.equal html
-  end
+# ruby -I lib test/parser_test.rb
 
-  def tce(html, creole)
+def tc(html, creole, options = {})
+  generated_html = Creole.creolize(creole, options)
+  # puts "creole = #{creole.inspect}"
+  # puts "generated_html = #{generated_html.inspect}"
+  generated_html.must_equal html
+end
+
+def tce(html, creole)
     tc(html, creole, :extensions => true)
-  end
 end
 
 describe Creole::Parser do

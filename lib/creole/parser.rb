@@ -230,8 +230,16 @@ module Creole
           end
         when /\A\[\[\s*([^|]*?)\s*(\|\s*(.*?))?\s*\]\]/m
           link = $1
+          # handle two '|', path separators
+          content = $3
+          if content && content.index('|')
+            # handle 2 '|' path separators
+            content_parts = content.split('|')
+            link = "#{$1}/#{content_parts[0]}"
+            content = content_parts[1]
+          end
           if uri = make_explicit_link(link)
-            @out << make_explicit_anchor(uri, $3 || link)
+            @out << make_explicit_anchor(uri, content|| link)
           else
             @out << escape_html($&)
           end

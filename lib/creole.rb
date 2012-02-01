@@ -13,4 +13,9 @@ module Creole
   def self.creolize(text, options = {})
     Parser.new(text, options).to_html
   end
+
+  def self.os_creolize(text, options = {})
+    opts = { :no_escape => true}.merge(options)
+    Parser.new(text, opts).to_html
+  end
 end
