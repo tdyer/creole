@@ -52,7 +52,8 @@ module Creole
     # No escaping: [[/Test]] --> Test
     attr_writer :no_escape
     def no_escape?; @no_escape; end
-    
+
+    # Create links as root relative, i.e. have a leading slash '/'
     attr_writer :root_link
     def root_link?; @root_link; end
 
@@ -219,6 +220,21 @@ module Creole
       make_local_link(link)
     end
 
+    # link is the first path segment
+    # content is the n+1, n > 0,  path segments and the link content
+    # Ex: |path_seg1| path segment2 |pathseg3| link content
+    # link => 'path_seg1'
+    # content =>  'path segment2 |pathseg3| link content'
+    # output ['link content', 'path_seg1/path segment2/pathseg3' ]
+    def multiple_path_segments(link, content)
+      if content && content.index('|')
+        content_parts = content.split('|')
+        content = content_parts.pop
+        link = "#{link}/#{content_parts[0..-1].map(&:strip).join('/')}"
+      end
+      [link, content]
+    end
+    
     def parse_inline(str)
       until str.empty?
         case str
@@ -233,15 +249,9 @@ module Creole
             end
           end
         when /\A\[\[\s*([^|]*?)\s*(\|\s*(.*?))?\s*\]\]/m
-          link = $1
-          # handle two '|', path separators
-          content = $3
-          if content && content.index('|')
-            # handle 2 '|' path separators
-            content_parts = content.split('|')
-            link = "#{$1}/#{content_parts[0]}"
-            content = content_parts[1]
-          end
+          link, content = $1, $3
+          # handle > 1 path separators, '|'
+          link, content = multiple_path_segments(link, content)
           if uri = make_explicit_link(link)
             @out << make_explicit_anchor(uri, content|| link)
           else

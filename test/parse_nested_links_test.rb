@@ -58,6 +58,19 @@
         Creole.os_creolize(nested_link, :no_escape => false, :root_link => false).must_equal escaped_link_result
       end
    end
+
+   it "#os_creolize with spaces in path separators " do
+     Creole.os_creolize("[[path seg1|path seg2|some content]]").must_equal "<p><a href=\"/path seg1/path seg2\">some content</a></p>"
+
+     # loose the leading and trailing spaces in the path segments
+     Creole.os_creolize("[[  path seg1|path seg2 |some content]]").must_equal "<p><a href=\"/path seg1/path seg2\">some content</a></p>"
+     # again
+     Creole.os_creolize("[[  path seg1 | path seg2 |some content]]").must_equal "<p><a href=\"/path seg1/path seg2\">some content</a></p>"
+   end
+
+   it "#os_creolize with many path segments" do
+     Creole.os_creolize('[[path_seg1| path segment2 |pathseg3| link content]]').must_equal "<p><a href=\"/path_seg1/path segment2/pathseg3\"> link content</a></p>"
+   end
    
  end
 
