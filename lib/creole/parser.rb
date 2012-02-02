@@ -52,6 +52,9 @@ module Creole
     # No escaping: [[/Test]] --> Test
     attr_writer :no_escape
     def no_escape?; @no_escape; end
+    
+    attr_writer :root_link
+    def root_link?; @root_link; end
 
     # Create a new CreoleParser instance.
     def initialize(text, options = {})
@@ -160,7 +163,8 @@ module Creole
     #   make_local_link("LocalLink") #=> "/LocalLink"
     #   make_local_link("Wikipedia:Bread") #=> "http://en.wikipedia.org/wiki/Bread"
     def make_local_link(link) #:doc:
-      no_escape? ? link : escape_url(link)
+      escaped_link =  (no_escape? ? link : escape_url(link))
+      root_link? ? "/#{escaped_link}" : escaped_link
     end
 
     # Sanatize a direct url (e.g. http://wikipedia.org/). The default
