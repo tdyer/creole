@@ -236,9 +236,10 @@ module Creole
 
       if link !~ /https?|ftps?|javascript/ && link.index(':')
         # handles this [[company:link]] not [[http:://google.com]]
+        # [[company:XFVAZZZ]]") => "<p><a href=\"/osn/companies/XFVAZZZ\">/osn/companies/XFVAZZZ</a></p>"
         content_parts = link.split(':')
-        link = content_parts[0].strip.pluralize
-        content = content_parts[1].strip
+        link = "#{content_parts[0].strip.pluralize}/#{content_parts[1].strip}"
+        content = "/osn/#{link}"
       elsif content && content.index('|')
         content_parts = content.split('|')
         content = content_parts.pop
