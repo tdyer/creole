@@ -1,5 +1,6 @@
 require 'cgi'
 require 'uri'
+require 'active_support/inflector'
 
 # :main: Creole
 
@@ -236,7 +237,7 @@ module Creole
       if link !~ /https?|ftps?|javascript/ && link.index(':')
         # handles this [[company:link]] not [[http:://google.com]]
         content_parts = link.split(':')
-        link = content_parts[0].strip
+        link = content_parts[0].strip.pluralize
         content = content_parts[1].strip
       elsif content && content.index('|')
         content_parts = content.split('|')

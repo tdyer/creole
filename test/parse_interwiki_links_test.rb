@@ -14,9 +14,7 @@
      # By default, Creole#creolize DOES escape link
      # and it does NOT make the link root relative
      it "#creolize" do
-       # Creole.os_creolize("[[company:XFVAZZZ]]").must_equal "<p><a href=\"/osn/companies\">XFVAZZZ</a></p>"
-       Creole.os_creolize("[[company:XFVAZZZ]]").must_equal "<p><a href=\"/osn/company\">XFVAZZZ</a></p>"
-       
+       Creole.os_creolize("[[company:XFVAZZZ]]").must_equal "<p><a href=\"/osn/companies\">XFVAZZZ</a></p>"
      end
      it "with raw links" do
        # debugger
