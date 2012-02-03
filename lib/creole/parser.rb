@@ -57,6 +57,9 @@ module Creole
     attr_writer :root_link
     def root_link?; @root_link; end
 
+    # Create links as root relative, i.e. have a leading slash '/'
+    attr_accessor :prefix
+
     # Create a new CreoleParser instance.
     def initialize(text, options = {})
       @allowed_schemes = %w(http https ftp ftps)
@@ -165,7 +168,9 @@ module Creole
     #   make_local_link("Wikipedia:Bread") #=> "http://en.wikipedia.org/wiki/Bread"
     def make_local_link(link) #:doc:
       escaped_link =  (no_escape? ? link : escape_url(link))
-      root_link? ? "/#{escaped_link}" : escaped_link
+      prefixed_link = prefix ? "#{prefix}/#{escaped_link}" : escaped_link
+      root_link = root_link? ? "/#{prefixed_link}" : prefixed_link
+
     end
 
     # Sanatize a direct url (e.g. http://wikipedia.org/). The default
@@ -227,7 +232,13 @@ module Creole
     # content =>  'path segment2 |pathseg3| link content'
     # output ['link content', 'path_seg1/path segment2/pathseg3' ]
     def multiple_path_segments(link, content)
-      if content && content.index('|')
+
+      if link !~ /https?|ftps?|javascript/ && link.index(':')
+        # handles this [[company:link]] not [[http:://google.com]]
+        content_parts = link.split(':')
+        link = content_parts[0].strip
+        content = content_parts[1].strip
+      elsif content && content.index('|')
         content_parts = content.split('|')
         content = content_parts.pop
         link = "#{link}/#{content_parts[0..-1].map(&:strip).join('/')}"
@@ -236,6 +247,7 @@ module Creole
     end
     
     def parse_inline(str)
+      # debugger
       until str.empty?
         case str
         when /\A(\~)?((https?|ftps?):\/\/\S+?)(?=([\,.?!:;"'\)]+)?(\s|$))/
@@ -257,6 +269,15 @@ module Creole
           else
             @out << escape_html($&)
           end
+        # when /\A\[\[\s*(.*)\s*:(.*)\]\]/
+        #   link, content = $1, $2
+        #   # content = content.pluralize if content
+        #   link, content = multiple_path_segments(link, content)
+        #   if uri = make_explicit_link(link)
+        #     @out << make_explicit_anchor(uri, content|| link)
+        #   else
+        #     @out << escape_html($&)
+        #   end
         when /\A\{\{\{(.*?\}*)\}\}\}/
           @out << '<tt>' << escape_html($1) << '</tt>'
         when /\A\{\{\s*(.*?)\s*(\|\s*(.*?)\s*)?\}\}/

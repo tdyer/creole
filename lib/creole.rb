@@ -17,7 +17,7 @@ module Creole
   # Same as above BUT links do NOT get escaped AND links are root
   # relative, i.e. they have a leading slash '/'
   def self.os_creolize(text, options = {})
-    opts = { :root_link => true, :no_escape => true}.merge(options)
+    opts = { :root_link => true, :no_escape => true, :prefix => 'osn'}.merge(options)
     Parser.new(text, opts).to_html
   end
 end
